@@ -68,9 +68,16 @@ public class PaymentResource {
 		this.paymentService.deleteById(Integer.parseInt(paymentId));
 		return ResponseEntity.ok(true);
 	}
-	
-	
-	
+
+	@PostMapping("/{paymentId}/refund")
+	public ResponseEntity<PaymentDto> refundPayment(
+			@PathVariable("paymentId")
+			@NotBlank(message = "Input must not be blank")
+			@Valid final String paymentId) {
+		log.info("*** PaymentDto, resource; refund payment *");
+		return ResponseEntity.ok(this.paymentService.findById(Integer.parseInt(paymentId)));
+	}
+
 }
 
 
