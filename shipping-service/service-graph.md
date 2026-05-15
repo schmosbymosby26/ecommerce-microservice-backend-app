@@ -7,32 +7,31 @@
 
 | Method | Path | Controller | Description |
 |--------|------|------------|-------------|
-| GET | /shipping-service/api/shippings | OrderItemResource | List all shipping order items |
-| GET | /shipping-service/api/shippings/{orderId}/{productId} | OrderItemResource | Get shipping order item by order ID and product ID |
-| GET | /shipping-service/api/shippings/find | OrderItemResource | Get shipping order item by composite ID (request body) |
-| POST | /shipping-service/api/shippings | OrderItemResource | Create a new shipping order item |
-| PUT | /shipping-service/api/shippings | OrderItemResource | Update a shipping order item |
-| DELETE | /shipping-service/api/shippings/{orderId}/{productId} | OrderItemResource | Delete shipping order item by order ID and product ID |
-| DELETE | /shipping-service/api/shippings/delete | OrderItemResource | Delete shipping order item by composite ID (request body) |
-| GET | /shipping-service/api/shippings/track/{orderId} | OrderItemResource | Track shipping items by order ID (added in PR #18) |
+| GET | /api/shippings | OrderItemResource | List all shipping order items |
+| GET | /api/shippings/{orderId}/{productId} | OrderItemResource | Get order item by composite ID |
+| GET | /api/shippings/find | OrderItemResource | Get order item by ID (request body) |
+| POST | /api/shippings | OrderItemResource | Create a new order item |
+| PUT | /api/shippings | OrderItemResource | Update an existing order item |
+| DELETE | /api/shippings/{orderId}/{productId} | OrderItemResource | Delete order item by composite ID |
+| DELETE | /api/shippings/delete | OrderItemResource | Delete order item by ID (request body) |
+| GET | /api/shippings/track/{orderId} | OrderItemResource | Track shipping items by order ID (added in PR #18) |
 
 ## Calls
 
 | Target service | Method | Path | Client type | Client class |
-|----------------|--------|------|-------------|______________|
-| product-service | GET | /product-service/api/products/{productId} | RestTemplate | OrderItemServiceImpl |
-| order-service | GET | /order-service/api/orders/{orderId} | RestTemplate | OrderItemServiceImpl |
+|----------------|--------|------|-------------|---------------|
+| product-service | GET | /api/products/{productId} | RestTemplate | OrderItemServiceImpl |
+| order-service | GET | /api/orders/{orderId} | RestTemplate | OrderItemServiceImpl |
 
 ## Third-party integrations
 
 | Type | Name | Direction | Details |
-|------|------|-----------|-------------------------|
-| Tracing | Zipkin | OUTBOUND | Distributed tracing via spring-cloud-sleuth-zipkin; base-url configurable via SPRING_ZIPKIN_BASE_URL |
-| Config | Spring Cloud Config Server | INBOUND | Imports config from configserver; URL configurable via SPRING_CONFIG_IMPORT |
-| ServiceDiscovery | Eureka | BIDIRECTIONAL | Registered as SHIPPING-SERVICE; uses spring-cloud-starter-netflix-eureka-client |
-| CircuitBreaker | Resilience4j | INTERNAL | Circuit breaker on shippingService instance; failure-rate-threshold=50%, sliding-window=10 |
-| Database | H2 (dev) | INBOUND | In-memory H2 database for dev profile |
-| Database | MySQL (prod/stage) | INBOUND | MySQL via mysql-connector-java for prod/stage profiles |
+|------|------|-----------|----------|
+| Zipkin | Distributed Tracing | PRODUCES | Traces sent to configurable Zipkin base URL |
+| Eureka | Service Discovery | BOTH | Registered as SHIPPING-SERVICE; uses load-balanced RestTemplate |
+| Spring Cloud Config | Config Server | CONSUMES | External config via configserver |
+| H2 / MySQL | Database | BOTH | H2 in-memory (dev), MySQL (prod) via JPA/Hibernate + Flyway |
+| Resilience4j | Circuit Breaker | INTERNAL | Circuit breaker on shippingService instance |
 
 ## Metadata
 
@@ -41,4 +40,3 @@
 - **Java version:** 11
 - **Port:** 8600
 - **Context path:** /shipping-service
-- **Spring Cloud version:** 2020.0.4
