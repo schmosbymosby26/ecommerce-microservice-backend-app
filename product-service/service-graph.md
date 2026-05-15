@@ -7,14 +7,14 @@
 
 | Method | Path | Controller | Description |
 |--------|------|------------|-------------|
-| GET | /product-service/api/products | ProductResource | Get all products |
+| GET | /product-service/api/products | ProductResource | List all products |
 | GET | /product-service/api/products/{productId} | ProductResource | Get product by ID |
 | POST | /product-service/api/products | ProductResource | Create a new product |
 | PUT | /product-service/api/products | ProductResource | Update product (body) |
 | PUT | /product-service/api/products/{productId} | ProductResource | Update product by ID |
 | DELETE | /product-service/api/products/{productId} | ProductResource | Delete product by ID |
-| GET | /product-service/api/products/search/{keyword} | ProductResource | Search products by keyword |
-| GET | /product-service/api/categories | CategoryResource | Get all categories |
+| GET | /product-service/api/products/search/{keyword} | ProductResource | Search products by keyword (added in PR #13) |
+| GET | /product-service/api/categories | CategoryResource | List all categories |
 | GET | /product-service/api/categories/{categoryId} | CategoryResource | Get category by ID |
 | POST | /product-service/api/categories | CategoryResource | Create a new category |
 | PUT | /product-service/api/categories | CategoryResource | Update category (body) |
@@ -25,23 +25,23 @@
 
 | Target service | Method | Path | Client type | Client class |
 |----------------|--------|------|-------------|---------------|
-| — | — | — | — | No outbound inter-service calls detected |
+| — | — | — | — | No outbound service calls detected |
 
 ## Third-party integrations
 
 | Type | Name | Direction | Details |
-|------|------|-----------|---------|
-| Tracing | Zipkin | OUTBOUND | Distributed tracing via spring-cloud-sleuth-zipkin; default base-url http://localhost:9411/ |
-| Database | H2 (dev) | INBOUND | In-memory H2 database used in dev profile |
-| Database | MySQL (prod/stage) | INBOUND | MySQL datasource used in prod/stage profiles |
-| Service Discovery | Eureka | OUTBOUND | Registers with Eureka server via spring-cloud-starter-netflix-eureka-client |
-| Config Server | Spring Cloud Config | INBOUND | Fetches config from configserver at http://localhost:9296 (default) |
+|------|------|-----------|----------|
+| HTTP | Zipkin | OUTBOUND | Distributed tracing; URL from SPRING_ZIPKIN_BASE_URL (default: http://localhost:9411/) |
+| HTTP | Spring Config Server | OUTBOUND | Centralized config; URL from SPRING_CONFIG_IMPORT (default: http://localhost:9296) |
+| Service Discovery | Eureka | OUTBOUND | Netflix Eureka client registration |
+| Database | H2 (in-memory) | INBOUND | Dev profile; jdbc:h2:mem:ecommerce_dev_db |
+| Database | MySQL | INBOUND | Prod/stage profiles; mysql-connector-java runtime dependency |
 
 ## Metadata
 
 - **Framework:** Spring Boot 2.5.7
 - **Build tool:** Maven
 - **Java version:** 11
-- **Port:** 8500 (dev); see application-prod.yml / application-stage.yml for other profiles
+- **Port:** 8500 (dev profile)
 - **Context path:** /product-service
-- **Spring Cloud version:** 2020.0.4
+- **Service name:** PRODUCT-SERVICE
