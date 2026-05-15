@@ -38,26 +38,23 @@
 ## Calls
 
 | Target service | Method | Path | Client type | Client class |
-|----------------|--------|------|-------------|--------------|
+|----------------|--------|------|-------------|------ -------|
 
-_No inter-service calls detected._
+_No outbound inter-service calls detected._
 
 ## Third-party integrations
 
 | Type | Name | Direction | Details |
-|------|------|-----------|---------|
-| Tracing | Zipkin | OUTBOUND | Distributed tracing; base-url: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/} |
-| Config | Spring Cloud Config | INBOUND | Fetches config from config-server: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:9296} |
-| Service Discovery | Eureka | OUTBOUND | Registers as USER-SERVICE with Eureka (spring-cloud-starter-netflix-eureka-client) |
-| Database | MySQL | INBOUND | Production datasource (mysql-connector-java) |
-| Database | H2 (in-memory) | INBOUND | Dev/test datasource; console at /h2-console |
-| Resilience | Resilience4j CircuitBreaker | INTERNAL | userService circuit breaker; failure threshold 50%, window 10 |
+|------|------|-----------|--------|
+| HTTP | Zipkin | PRODUCES | Distributed tracing via spring.zipkin.base-url |
+| HTTP | Spring Cloud Config | CONSUMES | Fetches config from configserver at startup |
+| Service Discovery | Eureka | BOTH | Registers as USER-SERVICE; load-balanced RestTemplate bean defined |
+| Database | H2 (dev) / MySQL (prod) | BOTH | Primary data store via Spring Data JPA |
 
 ## Metadata
 
-- **Framework:** Spring Boot (Spring Cloud 2020.0.4)
+- **Framework:** Spring Boot 2.5.7
 - **Build tool:** Maven
 - **Java version:** 11
 - **Port:** 8700
 - **Context path:** /user-service
-- **Flyway:** configured (migrations in src/main/resources/db)
