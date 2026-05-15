@@ -7,36 +7,33 @@
 
 | Method | Path | Controller | Description |
 |--------|------|------------|-------------|
-| GET | /api/shippings | OrderItemResource | List all shipping order items |
+| GET | /api/shippings | OrderItemResource | List all order items / shippings |
 | GET | /api/shippings/{orderId}/{productId} | OrderItemResource | Get order item by composite ID |
-| GET | /api/shippings/find | OrderItemResource | Get order item by ID (request body) |
-| POST | /api/shippings | OrderItemResource | Create a new order item |
-| PUT | /api/shippings | OrderItemResource | Update an existing order item |
+| GET | /api/shippings/find | OrderItemResource | Get order item by composite ID (request body) |
+| POST | /api/shippings | OrderItemResource | Create order item |
+| PUT | /api/shippings | OrderItemResource | Update order item |
 | DELETE | /api/shippings/{orderId}/{productId} | OrderItemResource | Delete order item by composite ID |
-| DELETE | /api/shippings/delete | OrderItemResource | Delete order item by ID (request body) |
-| GET | /api/shippings/track/{orderId} | OrderItemResource | Track shipping items by order ID (added in PR #18) |
+| DELETE | /api/shippings/delete | OrderItemResource | Delete order item by composite ID (request body) |
+| GET | /api/shippings/track/{orderId} | OrderItemResource | Track shippings by order ID |
 
 ## Calls
 
 | Target service | Method | Path | Client type | Client class |
 |----------------|--------|------|-------------|---------------|
-| product-service | GET | /api/products/{productId} | RestTemplate | OrderItemServiceImpl |
-| order-service | GET | /api/orders/{orderId} | RestTemplate | OrderItemServiceImpl |
+| product-service | GET | /product-service/api/products/{productId} | RestTemplate | OrderItemServiceImpl |
+| order-service | GET | /order-service/api/orders/{orderId} | RestTemplate | OrderItemServiceImpl |
 
 ## Third-party integrations
 
 | Type | Name | Direction | Details |
-|------|------|-----------|----------|
-| Zipkin | Distributed Tracing | PRODUCES | Traces sent to configurable Zipkin base URL |
-| Eureka | Service Discovery | BOTH | Registered as SHIPPING-SERVICE; uses load-balanced RestTemplate |
-| Spring Cloud Config | Config Server | CONSUMES | External config via configserver |
-| H2 / MySQL | Database | BOTH | H2 in-memory (dev), MySQL (prod) via JPA/Hibernate + Flyway |
-| Resilience4j | Circuit Breaker | INTERNAL | Circuit breaker on shippingService instance |
+|------|------|-----------|--------|
+| Zipkin | Zipkin Tracing | OUTBOUND | Distributed tracing; base URL http://localhost:9411/ |
+| Eureka | Service Registry | OUTBOUND | Service discovery via spring-cloud-starter-netflix-eureka-client |
+| MySQL | ecommerce_db | INBOUND | Primary data store (prod); H2 in-memory used in dev |
 
 ## Metadata
 
-- **Framework:** Spring Boot 2.5.7
+- **Framework:** Spring Boot (Spring Cloud 2020.0.4)
 - **Build tool:** Maven
 - **Java version:** 11
 - **Port:** 8600
-- **Context path:** /shipping-service
