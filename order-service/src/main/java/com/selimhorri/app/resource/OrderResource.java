@@ -96,6 +96,15 @@ public class OrderResource {
 		return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderService.findAll()));
 	}
 
+	@GetMapping("/status/{orderId}")
+	public ResponseEntity<OrderDto> getOrderStatus(
+			@PathVariable("orderId")
+			@NotBlank(message = "Input must not be blank")
+			@Valid final String orderId) {
+		log.info("*** OrderDto, resource; fetch order status *");
+		return ResponseEntity.ok(this.orderService.findById(Integer.parseInt(orderId)));
+	}
+
 }
 
 
