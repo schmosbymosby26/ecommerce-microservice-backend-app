@@ -13,8 +13,6 @@
 | PUT | /order-service/api/orders | OrderResource | Update order |
 | PUT | /order-service/api/orders/{orderId} | OrderResource | Update order by ID |
 | DELETE | /order-service/api/orders/{orderId} | OrderResource | Delete order by ID |
-| GET | /order-service/api/orders/summary | OrderResource | Get order summary (all orders) |
-| GET | /order-service/api/orders/user/{userId}/recent | OrderResource | Get recent orders for a user |
 | GET | /order-service/api/carts | CartResource | Get all carts |
 | GET | /order-service/api/carts/{cartId} | CartResource | Get cart by ID |
 | POST | /order-service/api/carts | CartResource | Create new cart |
@@ -33,6 +31,7 @@
 | Type | Name | Direction | Details |
 |------|------|-----------|--------|
 | Database | H2 (dev) | READ/WRITE | In-memory H2 database for dev profile |
+| Database | MySQL (stage/prod) | READ/WRITE | MySQL database for stage and prod profiles |
 | Config Server | Spring Cloud Config | READ | Imported via configserver at SPRING_CONFIG_IMPORT |
 | Tracing | Zipkin | WRITE | Distributed tracing via SPRING_ZIPKIN_BASE_URL |
 | Service Discovery | Eureka | READ/WRITE | Netflix Eureka client for service registration |
