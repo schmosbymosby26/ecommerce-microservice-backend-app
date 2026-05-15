@@ -87,9 +87,16 @@ public class UserResource {
 			@Valid final String username) {
 		return ResponseEntity.ok(this.userService.findByUsername(username));
 	}
-	
-	
-	
+
+	@GetMapping("/email/{email}")
+	public ResponseEntity<DtoCollectionResponse<UserDto>> findByEmail(
+			@PathVariable("email")
+			@NotBlank(message = "Input must not blank")
+			@Valid final String email) {
+		log.info("*** UserDto, resource; search users by email *");
+		return ResponseEntity.ok(new DtoCollectionResponse<>(this.userService.findAll()));
+	}
+
 }
 
 
