@@ -80,9 +80,31 @@ public class OrderResource {
 		this.orderService.deleteById(Integer.parseInt(orderId));
 		return ResponseEntity.ok(true);
 	}
-	
-	
-	
+
+	@GetMapping("/summary")
+	public ResponseEntity<DtoCollectionResponse<OrderDto>> getOrderSummary() {
+		log.info("*** OrderDto Summary, resource; fetch order summary *");
+		return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderService.findAll()));
+	}
+
+	@GetMapping("/user/{userId}/recent")
+	public ResponseEntity<DtoCollectionResponse<OrderDto>> findRecentOrdersByUser(
+			@PathVariable("userId")
+			@NotBlank(message = "Input must not be blank")
+			@Valid final String userId) {
+		log.info("*** OrderDto, resource; fetch recent orders for user *");
+		return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderService.findAll()));
+	}
+
+	@GetMapping("/status/{orderId}")
+	public ResponseEntity<OrderDto> getOrderStatus(
+			@PathVariable("orderId")
+			@NotBlank(message = "Input must not be blank")
+			@Valid final String orderId) {
+		log.info("*** OrderDto, resource; fetch order status *");
+		return ResponseEntity.ok(this.orderService.findById(Integer.parseInt(orderId)));
+	}
+
 }
 
 
