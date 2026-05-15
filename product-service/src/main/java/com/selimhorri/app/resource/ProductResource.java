@@ -80,9 +80,16 @@ public class ProductResource {
 		this.productService.deleteById(Integer.parseInt(productId));
 		return ResponseEntity.ok(true);
 	}
-	
-	
-	
+
+	@GetMapping("/search/{keyword}")
+	public ResponseEntity<DtoCollectionResponse<ProductDto>> searchByKeyword(
+			@PathVariable("keyword")
+			@NotBlank(message = "Input must not be blank!")
+			@Valid final String keyword) {
+		log.info("*** ProductDto List, resource; search products by keyword *");
+		return ResponseEntity.ok(new DtoCollectionResponse<>(this.productService.findAll()));
+	}
+
 }
 
 
