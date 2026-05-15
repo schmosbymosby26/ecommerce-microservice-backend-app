@@ -9,6 +9,7 @@
 |--------|------|------------|-------------|
 | GET | /order-service/api/orders | OrderResource | Get all orders |
 | GET | /order-service/api/orders/{orderId} | OrderResource | Get order by ID |
+| GET | /order-service/api/orders/status/{status} | OrderResource | Get orders filtered by lifecycle status (PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED) |
 | POST | /order-service/api/orders | OrderResource | Create new order |
 | PUT | /order-service/api/orders | OrderResource | Update order |
 | PUT | /order-service/api/orders/{orderId} | OrderResource | Update order by ID |
