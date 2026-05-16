@@ -1,0 +1,288 @@
+{
+  "generated_at": "2026-05-16T00:00:00Z",
+  "source_graph": "graphify-out/graph.json",
+  "summary": {
+    "total_handlers": 16,
+    "p0": 8,
+    "p1": 8,
+    "p2": 0,
+    "deferred": 0,
+    "used_fallback": false
+  },
+  "flows": [
+    {
+      "id": "order-create",
+      "priority": "P0",
+      "score": 13,
+      "axes": {
+        "business_impact": 3,
+        "blast_radius": 3,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 2
+      },
+      "handler_node": "func:proxy-client/OrderController.java:save",
+      "http": { "method": "POST", "path": "/app/api/orders" },
+      "covers": ["order-update", "order-get-by-id", "order-list"],
+      "rationale": "Order creation is the core purchase happy-path. OrderResource is rank-8 god node (9 edges); data_criticality=3 ('order' keyword in hard list); calls order-service which calls user-service cross-service. Requires ROLE_USER (user_facing=2).",
+      "confidence": "high"
+    },
+    {
+      "id": "authenticate-login",
+      "priority": "P0",
+      "score": 12,
+      "axes": {
+        "business_impact": 3,
+        "blast_radius": 3,
+        "data_criticality": 3,
+        "user_facing": 3,
+        "centrality": 0
+      },
+      "handler_node": "func:proxy-client/AuthenticationController.java:authenticate(POST)",
+      "http": { "method": "POST", "path": "/app/api/authenticate" },
+      "covers": [],
+      "rationale": "Hard include (login path). Publicly accessible (/api/authenticate/** permitAll). Authenticates via UsernamePasswordAuthenticationToken and issues JWT. Touches password + credential + token keywords (data_criticality=3). JwtUtilImpl is rank-7 god node; entire app auth depends on this service.",
+      "confidence": "high"
+    },
+    {
+      "id": "credential-create",
+      "priority": "P0",
+      "score": 12,
+      "axes": {
+        "business_impact": 3,
+        "blast_radius": 3,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/CredentialController.java:save",
+      "http": { "method": "POST", "path": "/app/api/credentials" },
+      "covers": ["credential-update", "credential-get-by-username"],
+      "rationale": "Credential creation directly writes to the password/credential store. CredentialServiceImpl is rank-14 god node (8 edges); data_criticality=3 (credential + password keywords). Login depends on this data existing. Requires ROLE_USER.",
+      "confidence": "high"
+    },
+    {
+      "id": "authenticate-jwt-validate",
+      "priority": "P0",
+      "score": 11,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 3,
+        "data_criticality": 3,
+        "user_facing": 3,
+        "centrality": 0
+      },
+      "handler_node": "func:proxy-client/AuthenticationController.java:authenticate(GET)",
+      "http": { "method": "GET", "path": "/app/api/authenticate/jwt/{jwt}" },
+      "covers": [],
+      "rationale": "JWT validation endpoint; called by JwtRequestFilter on every authenticated request. JwtUtilImpl is rank-7 god node. data_criticality=3 (jwt + token keywords). Publicly reachable (permitAll).",
+      "confidence": "high"
+    },
+    {
+      "id": "payment-create",
+      "priority": "P0",
+      "score": 11,
+      "axes": {
+        "business_impact": 3,
+        "blast_radius": 2,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/PaymentController.java:save",
+      "http": { "method": "POST", "path": "/app/api/payments" },
+      "covers": ["payment-update", "payment-get-by-id"],
+      "rationale": "Payment creation is core billing flow. data_criticality=3 (payment + billing keywords in hard list). PaymentServiceImpl calls order-service cross-service. PaymentResource rank=79 (top 100). Requires ROLE_USER.",
+      "confidence": "high"
+    },
+    {
+      "id": "user-register",
+      "priority": "P0",
+      "score": 11,
+      "axes": {
+        "business_impact": 3,
+        "blast_radius": 2,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/UserController.java:save",
+      "http": { "method": "POST", "path": "/app/api/users" },
+      "covers": ["user-update", "user-get-by-id"],
+      "rationale": "User creation/registration path. UserServiceImpl is rank-13 god node (8 edges). Reachable subgraph includes CredentialServiceImpl (credential/password chain), making data_criticality=3. Requires ROLE_USER.",
+      "confidence": "medium"
+    },
+    {
+      "id": "shipping-create",
+      "priority": "P0",
+      "score": 10,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 2,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/OrderItemController.java:save",
+      "http": { "method": "POST", "path": "/app/api/shippings" },
+      "covers": ["shipping-update", "shipping-get-by-id", "shipping-track"],
+      "rationale": "Shipping/order-item creation fulfills the post-purchase flow. data_criticality=3 ('order' keyword in hard list). Calls both order-service and product-service cross-service (blast_radius=2). OrderItemResource rank=69 (top 100). Requires ROLE_USER.",
+      "confidence": "medium"
+    },
+    {
+      "id": "actuator-health",
+      "priority": "P0",
+      "score": 4,
+      "axes": {
+        "business_impact": 1,
+        "blast_radius": 0,
+        "data_criticality": 0,
+        "user_facing": 3,
+        "centrality": 0
+      },
+      "handler_node": "func:proxy-client/ActuatorHealth",
+      "http": { "method": "GET", "path": "/app/actuator/health" },
+      "covers": [],
+      "rationale": "Hard include: publicly exposed /health endpoint (/actuator/health/** is permitAll in SecurityConfig). Spring Boot Actuator with Resilience4j circuit-breaker health indicator enabled.",
+      "confidence": "high"
+    },
+    {
+      "id": "user-get-by-username",
+      "priority": "P1",
+      "score": 10,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 2,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/UserController.java:findByUsername",
+      "http": { "method": "GET", "path": "/app/api/users/username/{username}" },
+      "covers": [],
+      "rationale": "User lookup by username supports auth and profile flows. UserServiceImpl rank=13 (god node). data_criticality=3 (auth/credential chain reachable from UserResource). Demoted to P1 to stay within P0 budget cap of 8.",
+      "confidence": "medium"
+    },
+    {
+      "id": "address-create",
+      "priority": "P1",
+      "score": 9,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 1,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/AddressController.java:save",
+      "http": { "method": "POST", "path": "/app/api/address" },
+      "covers": ["address-update", "address-get-by-id"],
+      "rationale": "Shipping address is PII data (data_criticality=3 via 'pii' keyword). Required for checkout completion. AddressResource rank=75 (top 100). Requires ROLE_USER.",
+      "confidence": "medium"
+    },
+    {
+      "id": "cart-create",
+      "priority": "P1",
+      "score": 9,
+      "axes": {
+        "business_impact": 3,
+        "blast_radius": 2,
+        "data_criticality": 1,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/CartController.java:save",
+      "http": { "method": "POST", "path": "/app/api/carts" },
+      "covers": ["cart-update", "cart-get-by-id", "cart-list"],
+      "rationale": "Cart is the pre-checkout state; required before order creation. CartServiceImpl calls user-service cross-service (blast_radius=2). No sensitive data keywords (data_criticality=1). CartResource rank=42 (top 100). Requires ROLE_USER.",
+      "confidence": "high"
+    },
+    {
+      "id": "verification-token-create",
+      "priority": "P1",
+      "score": 9,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 1,
+        "data_criticality": 3,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/VerificationTokenController.java:save",
+      "http": { "method": "POST", "path": "/app/api/verificationTokens" },
+      "covers": ["verification-token-update"],
+      "rationale": "Verification token creation for account/email verification. data_criticality=3 ('token' keyword in hard list). VerificationTokenResource rank=76 (top 100). Supporting auth feature. Requires ROLE_USER.",
+      "confidence": "medium"
+    },
+    {
+      "id": "product-create",
+      "priority": "P1",
+      "score": 8,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 1,
+        "data_criticality": 1,
+        "user_facing": 3,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/ProductController.java:save",
+      "http": { "method": "POST", "path": "/app/api/products" },
+      "covers": ["product-update"],
+      "rationale": "Product creation is publicly accessible (/api/products/** is permitAll, including POST — security concern). Catalog write operation. ProductResource rank=72 (top 100). Notable: unauthenticated writes allowed by current SecurityConfig.",
+      "confidence": "high"
+    },
+    {
+      "id": "product-list",
+      "priority": "P1",
+      "score": 7,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 1,
+        "data_criticality": 0,
+        "user_facing": 3,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/ProductController.java:findAll",
+      "http": { "method": "GET", "path": "/app/api/products" },
+      "covers": ["product-get-by-id"],
+      "rationale": "Public product catalog listing. Publicly reachable (permitAll). Important user-visible feature for browsing. No sensitive data. ProductResource rank=72 (top 100).",
+      "confidence": "high"
+    },
+    {
+      "id": "category-list",
+      "priority": "P1",
+      "score": 7,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 1,
+        "data_criticality": 0,
+        "user_facing": 3,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/CategoryController.java:findAll",
+      "http": { "method": "GET", "path": "/app/api/categories" },
+      "covers": ["category-get-by-id", "category-create", "category-update"],
+      "rationale": "Public category browsing (/api/categories/** permitAll). Supporting feature for product catalog navigation. CategoryResource rank=61 (top 100). No sensitive data.",
+      "confidence": "high"
+    },
+    {
+      "id": "favourite-add",
+      "priority": "P1",
+      "score": 6,
+      "axes": {
+        "business_impact": 2,
+        "blast_radius": 1,
+        "data_criticality": 0,
+        "user_facing": 2,
+        "centrality": 1
+      },
+      "handler_node": "func:proxy-client/FavouriteController.java:save",
+      "http": { "method": "POST", "path": "/app/api/favourites" },
+      "covers": ["favourite-get-by-id", "favourite-list"],
+      "rationale": "Wishlist/favourites feature; important user-visible but isolated service with no sensitive data. FavouriteResource rank=67 (top 100). Requires ROLE_USER.",
+      "confidence": "high"
+    }
+  ],
+  "deferred": [],
+  "report": "## Classification Report\n\n### Architecture Overview\nThis is a Spring Boot microservices e-commerce platform with a **proxy-client** (API gateway, context-path `/app`) fronting downstream microservices: user-service, order-service, payment-service, product-service, shipping-service, favourite-service.\n\n### Security Model\nSecurity is enforced by `SecurityConfig` in proxy-client with JWT (`JwtRequestFilter`):\n- **Public (permitAll):** `/api/authenticate/**`, `/api/categories/**`, `/api/products/**`, `/actuator/health/**`, `/actuator/info/**`\n- **Authenticated (ROLE_USER or ROLE_ADMIN):** All other `/api/**` endpoints\n- **Admin-only:** `/actuator/**` (except health/info)\n\n### God Nodes Informing Scoring\nTop relevant god nodes (by edge count in graph): JwtUtilImpl (#7, 10 edges), OrderResource (#8, 9 edges), UserServiceImpl (#13, 8 edges), CredentialServiceImpl (#14, 8 edges).\n\n### Key Decisions\n1. **order-create** scored highest (13) — OrderResource is a genuine god node (#8), order creation is the checkout happy-path, and 'order' hits the data_criticality keyword list.\n2. **authenticate-login** is a hard include (login path) and also scores 12 independently.\n3. **credential-create** scored 12 due to CredentialServiceImpl god-node rank and direct password/credential write.\n4. **user-get-by-username** (score=10) demoted from P0 to P1 to respect the 8-P0 budget cap; not a hard include.\n5. **actuator-health** included as P0 via hard-include rule despite low score (4).\n6. **Security finding:** `/api/products/**` and `/api/categories/**` are `permitAll` for ALL HTTP methods in SecurityConfig — this means unauthenticated users can create/update/delete products and categories. This is flagged in the `product-create` flow rationale.\n\n### Scope\n- Total distinct proxy-client HTTP handler classes: 12 controllers, 16 logical flow groups after de-duplication\n- P0 flows (8): authenticate-login, authenticate-jwt-validate, order-create, payment-create, credential-create, user-register, shipping-create, actuator-health\n- P1 flows (8): user-get-by-username, address-create, cart-create, verification-token-create, product-create, product-list, category-list, favourite-add\n- Internal microservice Resource classes (OrderResource, PaymentResource, etc.) are covered transitively through the proxy-client controllers and are not listed as separate flows to avoid duplication."
+}
