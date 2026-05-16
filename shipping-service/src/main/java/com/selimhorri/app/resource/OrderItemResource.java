@@ -89,9 +89,14 @@ public class OrderItemResource {
 		this.orderItemService.deleteById(orderItemId);
 		return ResponseEntity.ok(true);
 	}
-	
-	
-	
+
+	@GetMapping("/track/{orderId}")
+	public ResponseEntity<DtoCollectionResponse<OrderItemDto>> trackByOrderId(
+			@PathVariable("orderId") final String orderId) {
+		log.info("*** OrderItemDto List, resource; track shipping by order id *");
+		return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderItemService.findAll()));
+	}
+
 }
 
 
